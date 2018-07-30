@@ -153,3 +153,11 @@ exports.models = {
   VIP: () => mongoose.model('vips', exports.schemas.vip),
   Blacklist: () => mongoose.model('blacklists', exports.schemas.blacklist)
 }
+exports.buildGuild = (guild) => {
+  let guildJson = {
+    name: guild.name,
+    id: guild.id,
+    sources: {}
+  }
+  exports.currentGuilds.set(guild.id, guildJson)
+}

@@ -1,13 +1,16 @@
 const logger = require('../util/logger.js');
 const log = logger.command;
 const config = require('../config.json');
+const storage = require('../util/storage.js');
+const guildData = storage.currentGuilds;
 
 const commands = {
 	roleadd: addrole,
 	rolegive: addrole,
 	roleremove: removerole,
 	roledel: removerole,
-	rolerm: removerole
+	rolerm: removerole,
+	roleaddstaff: addstaffrole
 };
 
 module.exports = function (bot, message) {
@@ -112,6 +115,25 @@ function removerole(bot, message, args) {
 
 		if (roleIsEmpty && isColorRole(role[0].name)) role[0].delete('No users left in color role');
 	});
+}
+
+function addstaffrole(bot, message, args) {
+	if (message.member.id !== message.guild.ownerID) return message.channel.send('You don\'t have permission to do that!');
+	let roleName = args.join(' ');
+	let role = message.guild.roles.find('name', roleName);
+	if (!role) return message.channel.send('Sorry, I can\'t find the role "' + roleName + '"');
+	if (!guildData.has(message.guild.id)) storage.buildGuild(message.guild);
+	let guildSettings = guildData.get(message.guild.id);
+	let roleData = (guildSettings.roles) ? guildSettings.roles : {};
+	let staffRoles = (roleData.staff) ? roleData.staff : [];
+	staffRoles.push(role);
+	roleData.staff = staffRoles;
+	guildSettings.roles = roleData;
+	guildData.set(message.guild.id, guildSettings);
+}
+
+function getIsStaff(member) {
+	// TODO: Check for staff roles on member
 }
 
 function isColorRole(roleName) {
