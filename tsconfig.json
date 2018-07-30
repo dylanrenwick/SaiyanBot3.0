@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"outDir": "./bin",
+		"rootDir": "./src",
+		"alwaysStrict": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"target": "es6",
+		"experimentalDecorators": true,
+		"module": "commonjs",
+		"resolveJsonModule": true
+	},
+	"include": [
+		"./src/**/*"
+	]
+}

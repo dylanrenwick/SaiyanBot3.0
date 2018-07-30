@@ -19,7 +19,7 @@
     "moment-timezone": "^0.5.11",
     "mongoose": "^5.0.2",
     "needle": "^1.6.0",
-	"typescript": "^2.9.2"
+    "typescript": "^2.9.2"
   },
   "repository": {
     "type": "git",
