@@ -14,6 +14,7 @@
     "droll": "^0.2.1",
     "feedparser": "^2.1.0",
     "html-to-text": "^3.3.0",
+    "md5-file": "^4.0.0",
     "moment": "^2.17.1",
     "moment-timezone": "^0.5.11",
     "mongoose": "^5.0.2",
