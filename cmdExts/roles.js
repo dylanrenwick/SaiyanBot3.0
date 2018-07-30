@@ -34,7 +34,7 @@ function processCommand(message) {
 function addrole(bot, message, args) {
 	let roleName = args[0];
 	if (roleName.startsWith('#')) {
-		if (!/^#(?:[0-9a-fA-F]{3}){1,2}$/.test(roleName)) {
+		if (!isColorRole(roleName)) {
 			message.channel.send('Sorry, that is not a valid color');
 			return;
 		}
@@ -103,9 +103,17 @@ function removerole(bot, message, args) {
 		return;
 	}
 
+	let roleIsEmpty = (role[0].members.length === 1);
+
 	log.info('User has role');
 	member.removeRole(role[0]).then(member => {
 		log.info('Role removed');
 		message.channel.send('Role removed :+1:');
+
+		if (roleIsEmpty && isColorRole(role[0].name)) role[0].delete('No users left in color role');
 	});
+}
+
+function isColorRole(roleName) {
+	return (/^#(?:[0-9a-fA-F]{3}){1,2}$/.test(roleName));
 }
