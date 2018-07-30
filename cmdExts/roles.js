@@ -1,11 +1,13 @@
 const logger = require('../util/logger.js');
 const log = logger.command;
+const config = require('../config.json');
 
 const commands = {
-	addrole: addrole,
-	removerole: removerole,
-	delrole: removerole,
-	rmrole: removerole
+	roleadd: addrole,
+	rolegive: addrole,
+	roleremove: removerole,
+	roledel: removerole,
+	rolerm: removerole
 };
 
 module.exports = function (bot, message) {
@@ -20,7 +22,7 @@ module.exports = function (bot, message) {
 
 function processCommand(message) {
 	let content = message.content;
-	if (!content.startsWith('$')) return null;
+	if (!content.startsWith(config.bot.prefix + 'role')) return null;
 	let contentArr = content.split(' ');
 	let command = contentArr.shift().substring(1);
 	return {

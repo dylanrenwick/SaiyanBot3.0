@@ -1,6 +1,7 @@
 const logger = require('../util/logger.js');
 const log = logger.command;
 const dice = require('droll');
+const config = require('../config.json');
 
 const commands = {
 	roll: roll,
@@ -20,7 +21,7 @@ module.exports = function (bot, message) {
 
 function processCommand(message) {
 	let content = message.content;
-	if (!content.startsWith('$')) return null;
+	if (!content.startsWith(config.bot.prefix)) return null;
 	let contentArr = content.split(' ');
 	let command = contentArr.shift().substring(1);
 	return {
