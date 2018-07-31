@@ -1,73 +1,95 @@
-const Discord = require('discord.js')
+const Discord = require('discord.js');
 const COLORS = {
 	Error: '\x1b[31m',
 	Success: '\x1b[32m',
 	Warning: '\x1b[33m',
 	Debug: '\x1b[33m',
 	reset: '\x1b[0m'
-}
-const CONSTRUCTORS = [Discord.Guild, Discord.TextChannel, Discord.Role, Discord.User]
-const LOG_DATES = require('../config.json').log.dates === true
-const PREFIXES = ['G', 'C', 'R', 'U']
-const TYPES = ['Command', 'Guild', 'Cycle', 'INIT', 'General', 'Debug', 'Controller']
-const LEVELS = ['Error', 'Success', 'Warning', 'Info']
-const MAXLEN = TYPES.reduce((a, b) => a.length > b.length ? a : b).length + LEVELS.reduce((a, b) => a.length > b.length ? a : b).length + 1 // Calculate uniform spacing
-let suppressedLevels = []
+};
+const CONSTRUCTORS = [Discord.Guild, Discord.TextChannel, Discord.Role, Discord.User];
+const LOG_DATES = require('../config.json').log.dates === true;
+const PREFIXES = ['G', 'C', 'R', 'U'];
+const TYPES = ['Command', 'Guild', 'Cycle', 'INIT', 'General', 'Debug', 'Controller'];
+const LEVELS = ['Error', 'Success', 'Warning', 'Info'];
+const MAXLEN = TYPES.reduce((a, b) => a.length > b.length ? a : b).length + LEVELS.reduce((a, b) => a.length > b.length ? a : b).length + 1;
+let suppressedLevels = [];
 
 function formatConsoleDate (date) {
 	// http://stackoverflow.com/questions/18814221/adding-timestamps-to-all-console-messages
-	const hour = date.getHours()
-	const minutes = date.getMinutes()
-	const seconds = date.getSeconds()
-	const milliseconds = date.getMilliseconds()
-	return `[${((hour < 10) ? '0' + hour : hour)}:${((minutes < 10) ? '0' + minutes : minutes)}:${((seconds < 10) ? '0' + seconds : seconds)}.${('00' + milliseconds).slice(-3)}] `
+	const hour = padString(date.getHours(), 2, '0');
+	const minutes = padString(date.getMinutes(), 2, '0');
+	const seconds = padString(date.getSeconds(), 2, '0');
+	const milliseconds = padString(date.getMilliseconds(), 3, '0');
+	return `[${hour}:${minutes}:${seconds}.${milliseconds}] `;
 }
 
-class _Logger {
+function padString(string, length, padder = ' ', right = false) {
+	let str = string.toString();
+	let diff = length - str.length;
+	if (diff <= 0) return str;
+
+	let pad = padder.repeat(diff);
+	if (right) return str + pad;
+	else return pad + str;
+}
+
+class Logger {
 	constructor (type) {
-		this.type = type
+		this.type = type;
 		LEVELS.forEach(level => {
-			this[level.toLowerCase()] = this._log(level)
-		})
+			this[level.toLowerCase()] = this.log(level);
+		});
 	}
 
-	_parseDetails (details) {
-		if (details.length === 0) return { identifier: '' }
-		let error
-		let det = ''
+	parseDetails (details) {
+		if (details.length === 0) return { identifier: '' };
+		let error;
+		let det = '';
 		for (var q = 0; q < details.length; ++q) {
-			const item = details[q]
-			if (!item) continue
-			const i = CONSTRUCTORS.indexOf(item.constructor)
+			const item = details[q];
+			if (!item) continue;
+			const i = CONSTRUCTORS.indexOf(item.constructor);
 			if (i === -1) {
-				if (item instanceof Error) error = item
-				continue
+				if (item instanceof Error) error = item;
+				continue;
 			}
-			const pre = PREFIXES[i]
-			det += item.id && (item.name || item.username) ? `(${pre}: ${item.id}, ${item.name || item.username}) ` : item.id ? `(${pre} ${item.id}) ` : item.name ? `(${pre} ${item.name}) ` : ''
+			const pre = PREFIXES[i];
+			let stringName = (item.name || item.username);
+			if (item.id && stringName) det += `(${pre}: ${item.id}, ${stringName}) `;
+			else if (item.id) det += `(${pre} ${item.id}) `;
+			else if (item.name) det += `(${pre} ${item.name}) `;
 		}
-		return { identifier: det, err: error, printStack: error && details[details.length - 1] === true }
+		return { identifier: det, err: error, printStack: error && details[details.length - 1] === true };
 	}
 
-	_log (level) {
-		let intro = `${this.type} ${level}`
-		for (let i = intro.length; i < MAXLEN; ++i) intro += ' '
-		const color = COLORS[level] ? COLORS[level] : ''
-		const reset = COLORS.reset ? COLORS.reset : ''
+	log (level) {
+		let intro = `${this.type} ${level}`;
+		for (let i = intro.length; i < MAXLEN; ++i) intro += ' ';
+		const color = COLORS[level] ? COLORS[level] : '';
+		const reset = COLORS.reset ? COLORS.reset : '';
 		return (contents, ...details) => {
-			if (suppressedLevels.includes(level.toLowerCase())) return
-			const extra = this._parseDetails(details)
-			console.log(`${LOG_DATES ? formatConsoleDate(new Date()) : ''}${color}${intro}${reset} | ${extra.identifier}${contents}${extra.err ? ` (${extra.err}${extra.err.code ? `, Code ${extra.err.code}` : ''})` : ''}`)
-			if (extra.err && extra.printStack) console.log(extra.err.stack) // Print stack trace
-		}
+			if (suppressedLevels.includes(level.toLowerCase())) return;
+			const extra = this.parseDetails(details);
+			let message = '';
+			if (LOG_DATES) message += formatConsoleDate(new Date());
+			message += color + intro + reset + ' | ';
+			message += extra.indentifier + contents;
+			if (extra.err) {
+				message += ` (${extra.err}`;
+				if (extra.err.code) message += `, Code ${extra.err.code}`;
+				message += ')';
+			}
+			console.log(message);
+			if (extra.err && extra.printStack) console.log(extra.err.stack); // Print stack trace
+		};
 	}
 }
 
 TYPES.forEach(type => {
-	exports[type.toLowerCase()] = new _Logger(type)
-})
+	exports[type.toLowerCase()] = new Logger(type);
+});
 
 exports.suppressLevel = level => {
-	if (Array.isArray(level)) suppressedLevels = suppressedLevels.concat(level)
-	else suppressedLevels.push(level)
-}
+	if (Array.isArray(level)) suppressedLevels = suppressedLevels.concat(level);
+	else suppressedLevels.push(level);
+};
