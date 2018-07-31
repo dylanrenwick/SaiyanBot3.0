@@ -6,8 +6,11 @@ const COLORS = {
 	Debug: '\x1b[33m',
 	reset: '\x1b[0m'
 };
+const fs = require('fs');
+const config = require('../config.json');
 const CONSTRUCTORS = [Discord.Guild, Discord.TextChannel, Discord.Role, Discord.User];
-const LOG_DATES = require('../config.json').log.dates === true;
+const LOG_DATES = config.log.dates === true;
+const LOG_FILE = config.log.filePath;
 const PREFIXES = ['G', 'C', 'R', 'U'];
 const TYPES = ['Command', 'Guild', 'Cycle', 'INIT', 'General', 'Debug', 'Controller'];
 const LEVELS = ['Error', 'Success', 'Warning', 'Info'];
@@ -79,9 +82,15 @@ class Logger {
 				if (extra.err.code) message += `, Code ${extra.err.code}`;
 				message += ')';
 			}
-			console.log(message);
-			if (extra.err && extra.printStack) console.log(extra.err.stack); // Print stack trace
+
+			this.logMessage(message);
+			if (extra.err && extra.printStack) this.logMessage(extra.err.stack); // Print stack trace
 		};
+	}
+
+	logMessage(message) {
+		console.log(message);
+		if (LOG_FILE) fs.appendFile(LOG_FILE, message);
 	}
 }
 
