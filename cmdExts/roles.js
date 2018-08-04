@@ -4,56 +4,6 @@ const config = require('../config.json');
 const storage = require('../util/storage.js');
 const guildData = storage.currentGuilds;
 
-const commands = {
-	add: {
-		action: roles.add,
-		aliases: [
-			'add',
-			'give',
-			'grant',
-			'a'
-		]
-	},
-	remove: {
-		action: roles.del,
-		aliases: [
-			'remove',
-			'del',
-			'rm',
-			'delete',
-			'r'
-		]
-	},
-	addstaff: {
-		action: staff.add,
-		aliases: [
-			'addstaff'
-		]
-	},
-	removestaff: {
-		action: staff.del,
-		aliases: [
-			'removestaff'
-		]
-	},
-	whitelist: {
-		action: whitelist.add,
-		aliases: [
-			'whitelist',
-			'wl'
-		]
-	},
-	unwhitelist: {
-		action: whitelist.del,
-		aliases: [
-			'unwhitelist',
-			'uwl',
-			'blacklist',
-			'bl'
-		]
-	}
-};
-
 const typePrefix = 'role';
 
 module.exports = function (bot, message) {
@@ -278,5 +228,55 @@ const whitelist = {
 		guildData.set(message.guild.ind, guildSettings);
 
 		return message.channel.send(roleName + ' was removed from the whitelist :+1:');
+	}
+};
+
+const commands = {
+	add: {
+		action: roles.add,
+		aliases: [
+			'add',
+			'give',
+			'grant',
+			'a'
+		]
+	},
+	remove: {
+		action: roles.del,
+		aliases: [
+			'remove',
+			'del',
+			'rm',
+			'delete',
+			'r'
+		]
+	},
+	addstaff: {
+		action: staff.add,
+		aliases: [
+			'addstaff'
+		]
+	},
+	removestaff: {
+		action: staff.del,
+		aliases: [
+			'removestaff'
+		]
+	},
+	whitelist: {
+		action: whitelist.add,
+		aliases: [
+			'whitelist',
+			'wl'
+		]
+	},
+	unwhitelist: {
+		action: whitelist.del,
+		aliases: [
+			'unwhitelist',
+			'uwl',
+			'blacklist',
+			'bl'
+		]
 	}
 };
