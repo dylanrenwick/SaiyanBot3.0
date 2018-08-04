@@ -76,7 +76,7 @@ class Logger {
 			let message = '';
 			if (LOG_DATES) message += formatConsoleDate(new Date());
 			message += color + intro + reset + ' | ';
-			message += extra.indentifier + contents;
+			message += extra.identifier + contents;
 			if (extra.err) {
 				message += ` (${extra.err}`;
 				if (extra.err.code) message += `, Code ${extra.err.code}`;
