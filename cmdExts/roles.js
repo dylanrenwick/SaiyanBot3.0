@@ -231,8 +231,8 @@ const whitelist = {
 	}
 };
 
-const commands = {
-	add: {
+const commands = [
+	{
 		action: roles.add,
 		aliases: [
 			'add',
@@ -241,7 +241,7 @@ const commands = {
 			'a'
 		]
 	},
-	remove: {
+	{
 		action: roles.del,
 		aliases: [
 			'remove',
@@ -251,26 +251,26 @@ const commands = {
 			'r'
 		]
 	},
-	addstaff: {
+	{
 		action: staff.add,
 		aliases: [
 			'addstaff'
 		]
 	},
-	removestaff: {
+	{
 		action: staff.del,
 		aliases: [
 			'removestaff'
 		]
 	},
-	whitelist: {
+	{
 		action: whitelist.add,
 		aliases: [
 			'whitelist',
 			'wl'
 		]
 	},
-	unwhitelist: {
+	{
 		action: whitelist.del,
 		aliases: [
 			'unwhitelist',
@@ -279,4 +279,4 @@ const commands = {
 			'bl'
 		]
 	}
-};
+];
