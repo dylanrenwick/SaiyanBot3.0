@@ -20,7 +20,7 @@ function processCommand(message) {
 	let content = message.content;
 	if (!content.startsWith(config.bot.prefix + typePrefix)) return null;
 	let contentArr = content.split(' ');
-	let command = contentArr.shift().substring(config.bot.prefix);
+	let command = contentArr.shift().substring(config.bot.prefix.length);
 	if (command !== typePrefix) command = command.substring(typePrefix.length);
 
 	let foundCommands = commands.filter(c => c.aliases.includes(command));
