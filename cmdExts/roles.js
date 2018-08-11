@@ -10,10 +10,8 @@ module.exports = function (bot, message) {
 	let command = processCommand(message);
 	if (!command) return;
 
-	if (Object.keys(commands).includes(command.command)) {
-		log.info('Received command ' + command.command + ' with args: ' + command.args.join(', '));
-		command.action(bot, message, command.args);
-	}
+	log.info('Received command ' + command.command + ' with args: ' + command.args.join(', '));
+	command.action(bot, message, command.args);
 };
 
 function processCommand(message) {
@@ -37,6 +35,7 @@ function processCommand(message) {
 
 const roles = {
 	add: function (bot, message, args) {
+		if (args.length == 0) return message.channel.send('What role?');
 		let roleName = args[0];
 		if (roleName.startsWith('#')) {
 			if (!roles.isColorRole(roleName)) {
@@ -55,9 +54,7 @@ const roles = {
 		let member = message.member;
 		let role = guild.roles.find('name', roleName);
 		if (role) {
-			guild.member(member).addRole(role[0]).then(member => {
-				message.channel.send('Color changed :+1:');
-			});
+			roles.actuallyAddRole(message, guild, member, role);
 			return;
 		}
 
@@ -66,24 +63,26 @@ const roles = {
 			return log.error('Could not find bot role!');
 		}
 
-		let botPos = botRole[0].calculatedPosition;
+		let botPos = botRole.calculatedPosition;
 
 		guild.createRole({
 			name: roleName,
 			color: roleName
 		}).then(role => {
 			log.info('Created role ' + roleName);
-			guild.setRolePosition(role, botPos).then(guild => {
-				let role = Array.from(guild.roles.values()).filter(role => role.name.toLowerCase() === roleName)[0];
-				member.addRole(role).then(member => {
-					let memberRoles = Array.from(member.roles);
-					for(let i = 0; i < memberRoles.length; i++) {
-						let role = roles[i];
-						if (roles.isColorRole(role.name)) member.removeRole(role);
-					}
-					message.channel.send('Color changed :+1:');
-				});
-			});
+			guild.setRolePosition(role, botPos).then(guild => roles.actuallyAddRole(message, guild, member, role));
+		});
+	},
+	actuallyAddRole: function(message, guild, member, role) {
+		member.addRole(role).then(member => {
+			let memberRoles = member.roles.array();
+			for(let i = 0; i < memberRoles.length; i++) {
+				let otherRole = memberRoles[i];
+				if (roles.isColorRole(otherRole.name) && otherRole.name != role.name) {
+					member.removeRole(otherRole);
+				}
+			}
+			message.channel.send('Color changed :+1:');
 		});
 	},
 	addRegularRole: function (roleName, message) {
