@@ -8,6 +8,7 @@
   "bot": {
     "token": "",
     "enableCommands": true,
+	"commandsDirectory": "cmdExts/",
     "prefix": "$",
     "status": "online",
     "activityType": "",
