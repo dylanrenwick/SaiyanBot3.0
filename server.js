@@ -1,7 +1,7 @@
-const DiscordRSS = require('./index.js')
+const Discord = require('./index.js')
 const config = require('./config.json')
 
-const drss = new DiscordRSS.Client({ readFileSchedules: true, setPresence: true })
+const bot = new Discord.Client({ readFileSchedules: true, setPresence: true })
 let token = config.bot.token
 
 try {
@@ -9,4 +9,4 @@ try {
   token = override.bot && override.bot.token ? override.bot.token : token
 } catch (err) {}
 
-drss.login(token)
+bot.login(token)
