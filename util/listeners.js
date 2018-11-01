@@ -47,10 +47,10 @@ function readCommandsFile(file) {
 	if (!fileHashes[file]) fileHashes[file] = hash;
 	else if (fileHashes[file] == hash) return;
 	else fileHashes[file] = hash;
-	try { delete require.cache[require.resolve(fullPath)] } catch (e) {}
+	try { delete require.cache[require.resolve(fullPath)] } catch (e) { log.general.warning(`Failed to clear cache`, e); }
 	try {
 		cmdsExtensions.push(require(fullPath));
-		log.general.success(`Commands extension file ${fullPath} has been updated with hash ${fileHashes[file]}`);
+		log.general.success(`Commands extension file ${fullPath} has been updated with hash ${fileHashes[file]} (${cmdsExtensions.length} loaded)`);
 	} catch (e) {
 		log.general.warning(`Commands extension file ${fullPath} was changed, but could not be updated. Reason:\n`, e);
 	}
@@ -95,7 +95,7 @@ function messageReactionRemoveHandler (msgReaction, user) {
 function messageHandler (message) {
 	eventHandler('message')(storage.bot, message, config.bot.enableCommands === true ? null : true)
 	if (message.content.startsWith(config.bot.prefix)) {
-		try { cmdsExtensions.forEach(extension => extension(storage.bot, message)); } catch (e) {}
+		try { cmdsExtensions.forEach(extension => extension(storage.bot, message)); } catch (e) {log.command.info(e);}
 	}
 }
 
