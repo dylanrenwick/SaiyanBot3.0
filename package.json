@@ -9,6 +9,7 @@
     "url": "https://github.com/synzen/Discord.RSS/issues"
   },
   "dependencies": {
+    "bufferutil": "^4.0.0",
     "cloudscraper": "^1.4.1",
     "discord.js": "^11.3.2",
     "droll": "^0.2.1",
