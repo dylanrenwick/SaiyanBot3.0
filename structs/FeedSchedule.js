@@ -176,6 +176,7 @@ class FeedSchedule {
     this._sourceList.clear()
     let feedCount = 0 // For statistics in storage
     currentGuilds.forEach(guildRss => {
+      log.cycle.debug(`Adding ${guildRss} to source list`);
       feedCount += this._addToSourceLists(guildRss) // Returns the feed count for this guildRss
     })
     storage.statistics.feeds = feedCount
