@@ -1,3 +1,3 @@
-const debugRssNames = []
+const config = require('../config.json');
 
-exports.list = debugRssNames
+exports.list = config.log.debugFeed !== undefined ? config.log.debugFeed : false;

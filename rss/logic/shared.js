@@ -106,7 +106,7 @@ module.exports = (data, callback) => {
     }
 
     let processedArticles = 0
-    if (debugFeeds && debugFeeds.includes(rssName)) log.debug.info(`${rssName}: Processing collection. Total article list length: ${articleList.length}`)
+    if (debugFeeds) log.debug.info(`${rssName}: Processing collection. Total article list length: ${articleList.length}`)
 
     const maxAge = logicType === 'cycle' ? config.feeds.cycleMaxAge : config.feeds.defaultMaxAge
     const cutoffDay = moment().subtract(maxAge, 'days')
@@ -122,19 +122,19 @@ module.exports = (data, callback) => {
     for (var a = articleList.length - 1; a >= 0; --a) { // Loop from oldest to newest so the queue that sends articleMessages work properly, sending the older ones first
       const article = articleList[a]
       if (dbIds.length === 0 && articleList.length !== 1) { // Only skip if the articleList length is !== 1, otherwise a feed with only 1 article to send since it may have been the first item added
-        if (debugFeeds && debugFeeds.includes(rssName)) log.debug.info(`${rssName}: Not sending article (ID: ${article._id}, TITLE: ${article.title}) due to empty collection.`)
+        if (debugFeeds) log.debug.info(`${rssName}: Not sending article (ID: ${article._id}, TITLE: ${article.title}) due to empty collection.`)
         seenArticle(true, article)
       } else if (dbIds.includes(article._id)) {
-        if (debugFeeds && debugFeeds.includes(rssName)) log.debug.info(`${rssName}: Not sending article (ID: ${article._id}, TITLE: ${article.title}), ID was matched.`)
+        if (debugFeeds) log.debug.info(`${rssName}: Not sending article (ID: ${article._id}, TITLE: ${article.title}), ID was matched.`)
         seenArticle(true, article)
       } else if (checkTitle && dbTitles.includes(article.title)) {
-        if (debugFeeds && debugFeeds.includes(rssName)) log.debug.warning(`${rssName}: Not sending article (ID: ${article._id}, TITLE: ${article.title}), Title was matched but not ID.`)
+        if (debugFeeds) log.debug.warning(`${rssName}: Not sending article (ID: ${article._id}, TITLE: ${article.title}), Title was matched but not ID.`)
         seenArticle(true, article)
       } else if (checkDate && (!article.pubdate || article.pubdate.toString() === 'Invalid Date' || article.pubdate < cutoffDay)) {
-        if (debugFeeds && debugFeeds.includes(rssName)) log.debug.warning(`${rssName}: Not sending article (ID: ${article._id}, TITLE: ${article.title}), due to date check.`)
+        if (debugFeeds) log.debug.warning(`${rssName}: Not sending article (ID: ${article._id}, TITLE: ${article.title}), due to date check.`)
         seenArticle(true, article)
       } else {
-        if (debugFeeds && debugFeeds.includes(rssName)) log.debug.warning(`${rssName}: Sending article (ID: ${article._id}, TITLE: ${article.title}) to queue for send`)
+        if (debugFeeds) log.debug.warning(`${rssName}: Sending article (ID: ${article._id}, TITLE: ${article.title}) to queue for send`)
         seenArticle(false, article)
       }
     }
@@ -150,8 +150,8 @@ module.exports = (data, callback) => {
           const dbCustomComparisonValues = dbCustomComparisons[comparisonName]
           const articleCustomComparisonValue = article[comparisonName]
           if (!dbCustomComparisonValues || dbCustomComparisonValues.includes(articleCustomComparisonValue)) {
-            if (debugFeeds && debugFeeds.includes(rssName)) log.debug.info(`${rssName}: Not sending article (ID: ${article._id}, TITLE: ${article.title}) due to custom comparison check for ${comparisonName}`)
-            if (debugFeeds && debugFeeds.includes(rssName)) log.debug.info(`${rssName}: (ID: ${article._id}, TITLE: ${article.title}) ${comparisonName} dbCustomComparisonValues: ${dbCustomComparisonValues ? JSON.stringify(dbCustomComparisonValues) : undefined} `)
+            if (debugFeeds) log.debug.info(`${rssName}: Not sending article (ID: ${article._id}, TITLE: ${article.title}) due to custom comparison check for ${comparisonName}`)
+            if (debugFeeds) log.debug.info(`${rssName}: (ID: ${article._id}, TITLE: ${article.title}) ${comparisonName} dbCustomComparisonValues: ${dbCustomComparisonValues ? JSON.stringify(dbCustomComparisonValues) : undefined} `)
             continue // The comparison must either be uninitialized or invalid (no such comparison exists in any articles from the request), handled by a previous function. OR it exists in the db
           }
 
@@ -161,7 +161,7 @@ module.exports = (data, callback) => {
             article.customComparisons[comparisonName] = articleCustomComparisonValue
             toUpdate[article._id] = article
           }
-          if (debugFeeds && debugFeeds.includes(rssName)) log.debug.info(`${rssName}: Sending article (ID: ${article._id}, TITLE: ${article.title}) due to custom comparison check for ${comparisonName}`)
+          if (debugFeeds) log.debug.info(`${rssName}: Sending article (ID: ${article._id}, TITLE: ${article.title}) due to custom comparison check for ${comparisonName}`)
 
           return seenArticle(false, article)
         }
